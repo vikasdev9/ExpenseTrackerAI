@@ -7,11 +7,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -19,10 +22,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.expensetrackerai.features.analytics.AnalyticsScreen
+import com.example.expensetrackerai.features.auth.AuthViewModel
+import com.example.expensetrackerai.features.auth.OnboardingScreen
+import com.example.expensetrackerai.features.auth.SplashScreen
 import com.example.expensetrackerai.features.dashboard.DashboardScreen
 import com.example.expensetrackerai.features.transactions.AddTransactionScreen
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
+import com.example.expensetrackerai.features.settings.ProfileScreen
+import com.example.expensetrackerai.features.settings.SettingsViewModel
+
+sealed class Screen(val route: String, val title: String = "", val icon: ImageVector = Icons.Default.Circle) {
+    object Splash : Screen("splash")
+    object Onboarding : Screen("onboarding")
     object Dashboard : Screen("dashboard", "Home", Icons.Default.Home)
     object Analytics : Screen("analytics", "Insights", Icons.Default.Analytics)
     object Budgets : Screen("budgets", "Budgets", Icons.Default.AccountBalanceWallet)
@@ -31,27 +42,47 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
-    val items = listOf(
+    val authState by authViewModel.authState.collectAsState()
+    
+    val mainScreens = listOf(
         Screen.Dashboard,
         Screen.Analytics,
         Screen.Budgets,
         Screen.Profile
     )
 
+    // Handle Auth state changes
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthViewModel.AuthState.Onboarding -> {
+                navController.navigate(Screen.Onboarding.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            }
+            is AuthViewModel.AuthState.Authenticated -> {
+                navController.navigate(Screen.Dashboard.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            else -> {}
+        }
+    }
+
     Scaffold(
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
             
-            // Only show bottom bar on main screens
-            if (items.any { it.route == currentDestination?.route }) {
+            if (authState == AuthViewModel.AuthState.Authenticated && mainScreens.any { it.route == currentDestination?.route }) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
                     tonalElevation = 8.dp
                 ) {
-                    items.forEach { screen ->
+                    mainScreens.forEach { screen ->
                         NavigationBarItem(
                             icon = { Icon(screen.icon, contentDescription = null) },
                             label = { Text(screen.title) },
@@ -73,9 +104,19 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Dashboard.route,
+            startDestination = Screen.Splash.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(Screen.Splash.route) {
+                SplashScreen(onFinished = {
+                    authViewModel.onSplashFinished()
+                })
+            }
+            composable(Screen.Onboarding.route) {
+                OnboardingScreen(onFinished = {
+                    authViewModel.onOnboardingFinished()
+                })
+            }
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onAddTransactionClick = {
@@ -104,7 +145,7 @@ fun AppNavigation() {
                 PlaceholderScreen("Budgeting")
             }
             composable(Screen.Profile.route) {
-                PlaceholderScreen("User Profile")
+                ProfileScreen()
             }
         }
     }

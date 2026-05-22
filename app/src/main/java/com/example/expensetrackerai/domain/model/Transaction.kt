@@ -9,7 +9,9 @@ data class Transaction(
     val date: Date,
     val category: String,
     val type: TransactionType,
+    val walletId: Long,
     val note: String? = null,
+    val tags: List<String> = emptyList(),
     val imageUrl: String? = null
 )
 

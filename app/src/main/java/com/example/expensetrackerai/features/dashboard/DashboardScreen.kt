@@ -115,6 +115,10 @@ fun DashboardContent(state: DashboardUiState.Success) {
         item {
             QuickActionsRow()
         }
+
+        item {
+            FinancialHealthCard(state.healthScore)
+        }
         
         item {
             SpendingTrendCard()
@@ -165,6 +169,49 @@ fun QuickActionItem(icon: ImageVector, label: String, modifier: Modifier = Modif
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
             Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Composable
+fun FinancialHealthCard(score: Int) {
+    FintechCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("Financial Health", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(
+                    text = when {
+                        score >= 80 -> "Excellent"
+                        score >= 60 -> "Good"
+                        else -> "Needs Attention"
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                    color = when {
+                        score >= 80 -> Color(0xFF10B981)
+                        score >= 60 -> Color(0xFFF59E0B)
+                        else -> Color(0xFFEF4444)
+                    }
+                )
+            }
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    progress = { score / 100f },
+                    modifier = Modifier.size(64.dp),
+                    strokeWidth = 6.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+                Text(
+                    text = "$score", 
+                    style = MaterialTheme.typography.titleMedium, 
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

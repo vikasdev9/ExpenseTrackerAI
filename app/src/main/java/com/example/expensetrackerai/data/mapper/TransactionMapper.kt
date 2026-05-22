@@ -11,7 +11,9 @@ fun TransactionEntity.toDomain(): Transaction {
         date = date,
         category = category,
         type = type,
+        walletId = walletId,
         note = note,
+        tags = if (tags.isBlank()) emptyList() else tags.split(","),
         imageUrl = imageUrl
     )
 }
@@ -24,7 +26,9 @@ fun Transaction.toEntity(): TransactionEntity {
         date = date,
         category = category,
         type = type,
+        walletId = walletId,
         note = note,
+        tags = tags.joinToString(","),
         imageUrl = imageUrl
     )
 }

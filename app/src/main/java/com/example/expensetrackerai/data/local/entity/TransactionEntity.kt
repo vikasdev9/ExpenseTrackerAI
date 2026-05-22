@@ -14,6 +14,8 @@ data class TransactionEntity(
     val date: Date,
     val category: String,
     val type: TransactionType,
+    val walletId: Long,
     val note: String?,
+    val tags: String, // Stored as comma-separated string for simplicity in basic Room
     val imageUrl: String?
 )

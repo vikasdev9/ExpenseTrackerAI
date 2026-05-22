@@ -50,7 +50,8 @@ class AddTransactionViewModel @Inject constructor(
                     amount = amountDouble,
                     date = Date(),
                     category = category,
-                    type = type
+                    type = type,
+                    walletId = 1L // Default wallet for now
                 )
             )
             _eventFlow.emit(UiEvent.TransactionSaved)
