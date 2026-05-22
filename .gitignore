@@ -1,0 +1,100 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Local configuration
+local.properties
+
+# IDE files
+.idea/
+*.iml
+
+# Android Studio
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Kotlin
+.kotlin/
+
+# Generated files
+bin/
+gen/
+out/
+
+# Firebase
+google-services.json
+
+# Secrets
+.env
+secrets.properties
+apikeys.properties
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+
+# Temporary files
+*.tmp
+*.temp
+
+# APK / AAB
+*.apk
+*.aab
+
+# Coverage
+coverage/
+
+# Mac
+*.swp
+
+# VSCode
+.vscode/
+
+# Node
+node_modules/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Room DB export
+schemas/
+
+# Compose generated
+compose_compiler/
+
+# KSP
+.ksp/
+
+# Navigation generated
+.navigation/
+
+# ML Models
+*.tflite
+*.lite
+
+# Backup files
+backup/
+exports/
+
+# Ignore signing configs
+signing.properties
+
+# Sensitive credentials
+*.pem
+*.key
+*.p12
